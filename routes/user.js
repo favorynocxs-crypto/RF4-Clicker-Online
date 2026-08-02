@@ -168,8 +168,8 @@ router.post('/travel', authenticate, async (req, res) => {
   const hasVoyageur = req.user.has_voyageur;
   const cost = hasVoyageur ? 0 : wb.travelCost;
 
-  if (!hasVoyageur && req.user.level < wb.levelRequired) {
-    return res.status(400).json({ error: `Requires level ${wb.levelRequired}` });
+  if (req.user.level < wb.levelRequired) {
+    return res.status(400).json({ error: `Niveau ${wb.levelRequired} requis` });
   }
   if (!hasVoyageur && req.user.silver < cost) {
     return res.status(400).json({ error: 'Not enough Silver to travel!' });
