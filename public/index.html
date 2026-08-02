@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Russian Fishing 4 Clicker - Online</title>
+  <title>RF4 Cookie Clicker - Online</title>
   <link rel="stylesheet" href="style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,7 +16,7 @@
     <div class="auth-container">
       <div class="logo">
         <h1>RUSSIAN FISHING 4</h1>
-        <span class="subtitle">CLICKER ONLINE</span>
+        <span class="subtitle">COOKIE CLICKER ONLINE</span>
       </div>
       <div class="card">
         <div id="server-status" class="server-status-loading">Connexion au serveur de jeu...</div>
@@ -41,158 +41,137 @@
 
   <!-- Game Screen -->
   <div id="game-screen" class="screen">
-    <!-- Top HUD Bar -->
+    <!-- Top HUD Bar (Stretches full width, matching Canva style) -->
     <header class="hud-bar">
-      <div class="hud-user">
-        <div class="user-avatar">
-          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-        </div>
-        <div>
-          <h3 id="hud-username">Chargement...</h3>
-          <span class="hud-level">Niveau <span id="hud-lvl-val">1</span></span>
-        </div>
+      <!-- Left: Map Name -->
+      <div class="hud-left">
+        <h1 id="current-location-name">Lac aux moustique</h1>
       </div>
-      <div class="hud-xp">
-        <div class="xp-label">Expérience</div>
-        <div class="xp-progress-bar">
-          <div id="xp-progress" style="width: 0%"></div>
+      
+      <!-- Center: Player's Silver -->
+      <div class="hud-center">
+        <div class="silver-counter-wrapper">
+          <span class="silver-icon">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="var(--accent)" stroke-width="2.5"><circle cx="12" cy="12" r="8"></circle><path d="M12 8v8M9 10h6M9 13h6" stroke-linecap="round"></path></svg>
+          </span>
+          <span id="cookie-silver-val">0.00</span>
+          <span class="silver-label">Silver</span>
         </div>
-        <span id="hud-xp-val">0 / 100 XP</span>
+        <div class="sps-rate-indicator">SPS: +<span id="cookie-sps-val">0.00</span> /s</div>
       </div>
-      <div class="hud-currency">
-        <span class="currency-icon">
-          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="var(--accent)" stroke-width="2"><circle cx="12" cy="12" r="8"></circle><path d="M12 8v8M9 10h6M9 13h6" stroke-linecap="round"></path></svg>
-        </span>
-        <span id="hud-silver-val">0.00</span> <span class="currency-label">Silver</span>
+      
+      <!-- Right: Player's Level & XP -->
+      <div class="hud-right">
+        <div class="user-level-badge">Niveau <span id="hud-lvl-val">1</span></div>
+        <div class="xp-hud-bar">
+          <div class="xp-progress-bar"><div id="xp-progress"></div></div>
+          <span id="hud-xp-val">0 / 100 XP</span>
+        </div>
+        <button id="logout-btn" class="btn btn-danger btn-sm">Quitter</button>
       </div>
-      <button id="logout-btn" class="btn btn-danger btn-sm">Quitter</button>
     </header>
 
-    <div class="main-layout">
-      <!-- Sidebar Panels -->
-      <aside class="sidebar">
-        <!-- Current Setup -->
-        <div class="panel gear-panel">
+    <!-- Main Dashboard Area with floating overlay panels -->
+    <div class="game-dashboard">
+      
+      <!-- LEFT SIDEBAR: CONFIG & HELPERS -->
+      <div class="dashboard-sidebar sidebar-left">
+        <!-- Configuration Actuelle -->
+        <div class="panel">
           <h2>Configuration Actuelle</h2>
-          <div class="gear-setup">
-            <div class="gear-item">
-              <span class="gear-icon">
-                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round"><path d="m2 22 14-14"></path><path d="M14 8c.7-.7 1.3-1.6 1.7-2.6.4-1 .6-2.1.3-3.1a5 5 0 0 0-3-3c-1-.3-2.1-.3-3.1.1-1 .4-1.9 1-2.6 1.7"></path><path d="m17 7 4 4"></path></svg>
-              </span>
-              <div>
-                <label>Canne</label>
-                <div id="setup-rod" class="gear-name">Starter Tele</div>
-              </div>
+          <div class="gear-setup-vertical">
+            <!-- Rod -->
+            <div class="gear-setup-item">
+              <span class="setup-gear-type">Canne</span>
+              <span class="setup-gear-val" id="setup-rod">Starter Rod</span>
             </div>
-            <div class="gear-item">
-              <span class="gear-icon">
-                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle><path d="M12 2v4M12 18v4M2 12h4M18 12h4"></path></svg>
-              </span>
-              <div>
-                <label>Moulinet</label>
-                <div id="setup-reel" class="gear-name">Lacerti 4000S</div>
-              </div>
+            <!-- Reel -->
+            <div class="gear-setup-item">
+              <span class="setup-gear-type">Moulinet</span>
+              <span class="setup-gear-val" id="setup-reel">Starter Reel</span>
             </div>
-            <div class="gear-item">
-              <span class="gear-icon">
-                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="7"></circle><path d="M12 5a7 7 0 0 1 7 7M5 12a7 7 0 0 1 7 7"></path></svg>
-              </span>
-              <div>
-                <label>Ligne</label>
-                <div id="setup-line" class="gear-name">Syberia Mono (3.2kg)</div>
-              </div>
+            <!-- Line -->
+            <div class="gear-setup-item">
+              <span class="setup-gear-type">Ligne</span>
+              <span class="setup-gear-val" id="setup-line">Starter Line</span>
             </div>
-            <div class="gear-item">
-              <span class="gear-icon">
-                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round"><path d="M18 3v10a5 5 0 0 1-5 5c-3 0-5-2-5-5h2a3 3 0 0 0 3 3 3 3 0 0 0 3-3V3h2z"></path></svg>
-              </span>
-              <div>
-                <label>Appât</label>
-                <div id="setup-bait" class="gear-name">Bread</div>
-              </div>
+            <!-- Bait -->
+            <div class="gear-setup-item">
+              <span class="setup-gear-type">Appât</span>
+              <span class="setup-gear-val" id="setup-bait">Pain</span>
             </div>
           </div>
         </div>
 
-        <!-- Recent Catches -->
-        <div class="panel catch-panel">
-          <h2>Dernières Prises</h2>
-          <div class="catch-list" id="recent-catches-list">
+        <!-- Vos Améliorations de Pêche -->
+        <div class="panel">
+          <h2>Vos Améliorations</h2>
+          <div class="helpers-list" id="owned-helpers-list">
             <!-- Dynamically populated -->
           </div>
         </div>
-      </aside>
+      </div>
 
-      <!-- Central Game and Tab View -->
-      <main class="content-area">
-        <!-- Navigation Tabs -->
+      <!-- CENTER: THE FISHING COMBAT ZONE -->
+      <div class="clicker-game-center">
+        <!-- Fishing Style Selection -->
+        <div class="fishing-style-panel" id="fishing-style-selector">
+          <button class="style-select-btn active" data-style="fond">Pêche de Fond</button>
+          <button class="style-select-btn" data-style="leurre">Pêche au Leurre</button>
+          <button class="style-select-btn" id="style-select-vif" data-style="vif">Pêche au Vif</button>
+        </div>
+
+        <div class="fishing-zone-card" id="fishing-zone-clicker">
+          <div class="fishing-zone-ripple"></div>
+          <div class="fishing-zone-status" id="fishing-status-text">CLIQUEZ POUR PÊCHER</div>
+          
+          <!-- Combat State UI -->
+          <div class="fishing-combat-container" id="combat-container" style="display: none;">
+            <div class="combat-fish-title" id="combat-fish-name">UN POISSON COMBAT !</div>
+            <div class="combat-fish-rarity" id="combat-fish-rarity">Commun</div>
+            
+            <div class="fishing-progress-bar-wrapper combat-wrapper">
+              <div class="fishing-progress-bar-fill combat-fill" id="combat-progress-fill"></div>
+            </div>
+            
+            <div class="combat-timer" id="combat-timer-text" style="color:var(--danger); font-weight:700; margin-top:5px; font-size:0.9rem;">Temps restant : 8.0s</div>
+            <div class="combat-clicks-left" id="combat-clicks-left">Dégâts : 0 / 100</div>
+          </div>
+        </div>
+        <p class="clicker-hint" id="fishing-action-hint">Cliquez sur la zone ci-dessus pour ferrer un poisson et le combattre !</p>
+      </div>
+
+      <!-- RIGHT SIDEBAR: SHOP / LEADERBOARD TABS -->
+      <div class="dashboard-sidebar sidebar-right">
+        <!-- Tab Navigation Buttons -->
         <nav class="nav-tabs">
-          <button class="tab-btn active" data-tab="tab-fishing">Pêche</button>
-          <button class="tab-btn" data-tab="tab-inventory">Inventaire</button>
-          <button class="tab-btn" data-tab="tab-shop">Magasin</button>
+          <button class="tab-btn active" data-tab="tab-shop">Magasin</button>
+          <button class="tab-btn" data-tab="tab-inventory">Matériel</button>
+          <button class="tab-btn" data-tab="tab-bourriche">Bourriche</button>
+          <button class="tab-btn" data-tab="tab-prises">Mes Prises</button>
+          <button class="tab-btn" data-tab="tab-quests">Défis</button>
           <button class="tab-btn" data-tab="tab-travel">Voyage</button>
+          <button class="tab-btn" data-tab="tab-map">Info Map</button>
           <button class="tab-btn" data-tab="tab-leaderboard">Classement</button>
+          <button class="tab-btn" data-tab="tab-account">Compte</button>
+          <button class="tab-btn" data-tab="tab-stats">Statistiques</button>
+          <button class="tab-btn" data-tab="tab-repair" style="color:var(--warning);">Réparation</button>
         </nav>
 
-        <!-- Tab Content: Fishing -->
-        <div id="tab-fishing" class="tab-content active">
-          <div class="fishing-zone">
-            <div class="location-banner">
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 5px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-              <span id="current-location-name">Mosquito Lake</span>
-            </div>
-
-            <!-- Fishing Water & Target Click Area -->
-            <div class="water-container" id="water-area">
-              <div class="bobber-wave" id="bobber-ripple"></div>
-              <div class="bobber" id="fishing-bobber"></div>
-              
-              <div class="fishing-state-msg" id="fishing-state-msg">
-                Prêt à lancer votre ligne.
-              </div>
-
-              <!-- Fishing Main Button -->
-              <button id="action-btn" class="btn btn-action">Lancer la ligne</button>
-            </div>
-
-            <!-- Fight / Reel Combat HUD -->
-            <div class="fight-hud" id="fight-hud">
-              <h3>Combat en cours ! Maintenez la tension</h3>
-              <p>Cliquez à plusieurs reprises pour ramener le poisson, attention à ne pas casser la ligne !</p>
-              <div class="tension-meter-container">
-                <div class="tension-bar-labels">
-                  <span>Faible</span>
-                  <span>Optimal</span>
-                  <span>Zone Rouge</span>
-                </div>
-                <div class="tension-meter-bg">
-                  <div class="tension-indicator" id="tension-indicator" style="width: 50%"></div>
-                </div>
-              </div>
-              <button id="reel-btn" class="btn btn-reel">MOU L I N E R !</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Tab Content: Inventory -->
-        <div id="tab-inventory" class="tab-content">
-          <div class="panel">
-            <h2>Votre Sac de Pêche</h2>
-            <div class="inventory-grid" id="inventory-grid">
-              <!-- Dynamically populated -->
-            </div>
-          </div>
-        </div>
-
         <!-- Tab Content: Shop -->
-        <div id="tab-shop" class="tab-content">
+        <div id="tab-shop" class="tab-content active">
           <div class="panel">
             <h2>Boutique RF4</h2>
             <div class="shop-tabs">
-              <button class="shop-tab-btn active" data-shop="rods">Cannes</button>
+              <button class="shop-tab-btn active" data-shop="auto">Améliorations</button>
+              <button class="shop-tab-btn" data-shop="rods">Cannes</button>
               <button class="shop-tab-btn" data-shop="reels">Moulinets</button>
               <button class="shop-tab-btn" data-shop="lines">Fils</button>
-              <button class="shop-tab-btn" data-shop="baits">Appâts</button>
+              <button class="shop-tab-btn" data-shop="vers">Vers</button>
+              <button class="shop-tab-btn" data-shop="vifs">Vifs</button>
+              <button class="shop-tab-btn" data-shop="artificiel">Artificiels</button>
+              <button class="shop-tab-btn" data-shop="leurres">Leurres</button>
+              <button class="shop-tab-btn" data-shop="p2w" style="color:var(--accent); font-weight:800;">🔥 BOUTIQUE OR</button>
             </div>
             <div class="shop-grid" id="shop-grid">
               <!-- Dynamically populated -->
@@ -200,12 +179,65 @@
           </div>
         </div>
 
+        <!-- Tab Content: Inventory -->
+        <div id="tab-inventory" class="tab-content">
+          <div class="panel">
+            <h2>Votre Matériel</h2>
+            <div class="inventory-grid" id="inventory-grid">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab Content: Bourriche -->
+        <div id="tab-bourriche" class="tab-content">
+          <div class="panel">
+            <h2>Votre Bourriche (Vivier)</h2>
+            <div style="margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;">
+              <span id="bourriche-count-lbl" style="font-size: 0.95rem; color: var(--text-muted); font-weight: 600;">0 poisson(s)</span>
+              <button class="btn btn-primary btn-sm" id="sell-bourriche-btn" style="background-color: var(--accent); color: #000;">Vendre toute la bourriche</button>
+            </div>
+            <div class="inventory-grid" id="bourriche-grid">
+              <!-- Dynamically populated fish -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab Content: Mes Prises -->
+        <div id="tab-prises" class="tab-content">
+          <div class="panel">
+            <h2>Mes Prises (Records)</h2>
+            <div class="inventory-grid" id="prises-grid">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab Content: Quests -->
+        <div id="tab-quests" class="tab-content">
+          <div class="panel">
+            <h2>Défis de Pêche</h2>
+            <div class="helpers-list" id="quests-list">
+              <!-- Dynamically populated quests -->
+            </div>
+          </div>
+        </div>
+
         <!-- Tab Content: Travel -->
         <div id="tab-travel" class="tab-content">
           <div class="panel">
-            <h2>Plans d'eau disponibles</h2>
-            <p class="section-desc">Débloquez de nouveaux spots et attrapez des espèces uniques de Russian Fishing 4.</p>
+            <h2>Voyager (Multiplicateurs)</h2>
             <div class="travel-grid" id="travel-grid">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab Content: Info Map -->
+        <div id="tab-map" class="tab-content">
+          <div class="panel">
+            <h2>Informations de la Map Actuelle</h2>
+            <div id="map-info-container">
               <!-- Dynamically populated -->
             </div>
           </div>
@@ -214,17 +246,16 @@
         <!-- Tab Content: Leaderboard -->
         <div id="tab-leaderboard" class="tab-content">
           <div class="panel">
-            <h2>Classement des pêcheurs</h2>
+            <h2>Meilleurs Pêcheurs</h2>
             <div class="table-container">
               <table class="leaderboard-table">
                 <thead>
                   <tr>
                     <th>Rang</th>
-                    <th>Joueur</th>
+                    <th>Pêcheur</th>
                     <th>Niveau</th>
-                    <th>XP Totale</th>
                     <th>Argent (Silver)</th>
-                    <th>Prises</th>
+                    <th>Améliorations</th>
                   </tr>
                 </thead>
                 <tbody id="leaderboard-body">
@@ -235,41 +266,91 @@
           </div>
         </div>
 
-      </main>
+        <!-- Tab Content: Account -->
+        <div id="tab-account" class="tab-content">
+          <div class="panel">
+            <h2>Votre Compte</h2>
+            <p><strong>Nom d'utilisateur:</strong> <span id="account-username-lbl">...</span></p>
+            <p style="margin-top:20px;"><button class="btn btn-primary" onclick="logout()">Se déconnecter</button></p>
+          </div>
+        </div>
+
+        <!-- Tab Content: Statistiques -->
+        <div id="tab-stats" class="tab-content">
+          <div class="panel">
+            <h2>Statistiques du Pêcheur</h2>
+            <div class="gear-setup-vertical">
+              <div class="gear-setup-item">
+                <span>Niveau :</span>
+                <strong id="stat-level">1</strong>
+              </div>
+              <div class="gear-setup-item">
+                <span>Expérience Totale :</span>
+                <strong id="stat-xp">0 XP</strong>
+              </div>
+              <div class="gear-setup-item">
+                <span>Nombre total de prises :</span>
+                <strong id="stat-catches">0</strong>
+              </div>
+              <div class="gear-setup-item">
+                <span>Capital total obtenu :</span>
+                <strong id="stat-capital">0 Silver</strong>
+              </div>
+              <div class="gear-setup-item">
+                <span>Total Silver dépensé :</span>
+                <strong id="stat-spent">0 Silver</strong>
+              </div>
+              <div class="gear-setup-item">
+                <span>Temps total joué :</span>
+                <strong id="stat-time">0 min</strong>
+              </div>
+              <div class="gear-setup-item">
+                <span>Clics effectués :</span>
+                <strong id="stat-clicks">0</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab Content: Réparation -->
+        <div id="tab-repair" class="tab-content">
+          <div class="panel">
+            <h2>Réparation d'Équipement</h2>
+            <div class="inventory-grid" id="repair-grid">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+        </div>
+
+      </div>
+
     </div>
   </div>
 
   <!-- Notification Popup -->
   <div id="toast" class="toast"></div>
 
-  <!-- Catch Splash Screen -->
-  <div id="catch-splash" class="splash-overlay">
+  <!-- Offline Gains Screen -->
+  <div id="offline-splash" class="splash-overlay">
     <div class="splash-card">
-      <div class="splash-header">Nouvelle Prise !</div>
+      <div class="splash-header">Pêche hors-ligne ! 🐟</div>
       <div class="fish-display">
         <span class="fish-graphic">
           <svg viewBox="0 0 24 24" width="80" height="80" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="fish-swim"><path d="M23 12c-2.5-3-6-4-10-4-3 0-6 1-8 3L2 9v6l3-2c2 2 5 3 8 3 4 0 7.5-1 10-4z"></path><path d="M18 10a1 1 0 1 0 0 2 1 1 0 1 0 0-2z"></path></svg>
         </span>
-        <h2 id="catch-fish-name">Carassin doré</h2>
-        <div class="fish-detail">Poids: <span id="catch-fish-weight">1.250</span> kg</div>
+        <h2>Vos améliorations ont travaillé</h2>
+        <div class="fish-detail">Pendant votre absence de <span id="offline-seconds-val">0</span> secondes.</div>
       </div>
       <div class="splash-rewards">
         <div class="reward-item">
           <span class="reward-icon">
             <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="var(--accent)" stroke-width="2"><circle cx="12" cy="12" r="8"></circle><path d="M12 8v8M9 10h6M9 13h6" stroke-linecap="round"></path></svg>
           </span>
-          <div class="reward-val" id="catch-reward-silver">+4.50</div>
-          <div class="reward-lbl">Silver</div>
-        </div>
-        <div class="reward-item">
-          <span class="reward-icon">
-            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round"><path d="m18 16 4-4-4-4M6 8l-4 4 4 4M2 12h20"></path></svg>
-          </span>
-          <div class="reward-val" id="catch-reward-xp">+120</div>
-          <div class="reward-lbl">XP</div>
+          <div class="reward-val" id="offline-silver-reward">+0.00</div>
+          <div class="reward-lbl">Silver récolté</div>
         </div>
       </div>
-      <button id="catch-close-btn" class="btn btn-primary">Remettre dans le vivier</button>
+      <button id="offline-close-btn" class="btn btn-primary">Récupérer</button>
     </div>
   </div>
 
