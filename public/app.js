@@ -93,13 +93,27 @@ function showScreen(screenId) {
 
 // Fetch constant game metadata
 async function fetchMetadata() {
+  const statusEl = document.getElementById('server-status');
   try {
     const res = await fetch(`${API_URL}/api/metadata`);
+    if (!res.ok) throw new Error("Metadata request failed");
     metadata = await res.json();
+    if (statusEl) {
+      statusEl.style.display = 'none';
+    }
   } catch (err) {
-    showToast('Erreur de chargement des données du jeu', 'danger');
+    console.warn("API Server offline, retrying...", err);
+    if (statusEl) {
+      statusEl.innerText = "Serveur en veille. Réveil en cours (veuillez patienter)...";
+      statusEl.style.backgroundColor = "rgba(217, 75, 75, 0.1)";
+      statusEl.style.borderColor = "rgba(217, 75, 75, 0.3)";
+      statusEl.style.color = "var(--danger)";
+    }
+    // Retry in 3 seconds to auto-recover when Render wakes up
+    setTimeout(fetchMetadata, 3000);
   }
 }
+
 
 // Refresh whole user state
 async function refreshState() {
@@ -135,6 +149,13 @@ function startPeriodicRefresh() {
   }, 10000);
 }
 
+const WATER_BODIES_BG = {
+  'Mosquito Lake': 'mosquito_lake.jpg',
+  'Winding Rivulet': 'winding_rivulet.jpg',
+  'Kuori Lake': 'kuori_lake.jpg',
+  'Bear Lake': 'bear_lake.jpg'
+};
+
 function updateHUD() {
   if (!userState) return;
   const { user } = userState;
@@ -142,6 +163,10 @@ function updateHUD() {
   hudLvlVal.innerText = user.level;
   hudSilverVal.innerText = user.silver.toFixed(2);
   currentLocName.innerText = user.current_water_body;
+
+  // Change background of water container dynamically
+  const bgImg = WATER_BODIES_BG[user.current_water_body] || 'mosquito_lake.jpg';
+  waterArea.style.backgroundImage = `url('images/${bgImg}')`;
 
   // XP calculation
   const currentLvlXP = (user.level - 1) * (user.level - 1) * 100;
@@ -157,6 +182,7 @@ function updateHUD() {
   setupLine.innerText = user.current_line;
   setupBait.innerText = user.current_bait;
 }
+
 
 // Authentication Logic
 let isRegisterMode = false;

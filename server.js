@@ -11,86 +11,83 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// In-memory active fishing sessions to validate catches and prevent cheating
-// format: { token: { fish, castTime } }
 const activeSessions = {};
 
-// Constant game data
+// Constant game data with exact RF4 French names
 const WATER_BODIES = {
   'Mosquito Lake': {
     levelRequired: 1,
     travelCost: 0,
     fish: [
-      { name: 'Crucian Carp', minW: 0.1, maxW: 2.5, valPerKg: 8, xpPerKg: 10, baits: ['Bread', 'Red Worm', 'Maggots'] },
-      { name: 'Gibel Carp', minW: 0.1, maxW: 2.0, valPerKg: 9, xpPerKg: 12, baits: ['Bread', 'Red Worm', 'Maggots'] },
-      { name: 'Common Roach', minW: 0.05, maxW: 1.5, valPerKg: 10, xpPerKg: 15, baits: ['Bread', 'Maggots'] },
-      { name: 'Perch', minW: 0.1, maxW: 1.8, valPerKg: 12, xpPerKg: 18, baits: ['Red Worm'] }
+      { name: 'Carassin doré', minW: 0.1, maxW: 2.5, valPerKg: 8, xpPerKg: 10, baits: ['Pain', 'Ver rouge', 'Asticots'] },
+      { name: 'Carassin argenté', minW: 0.1, maxW: 2.0, valPerKg: 9, xpPerKg: 12, baits: ['Pain', 'Ver rouge', 'Asticots'] },
+      { name: 'Gardon', minW: 0.05, maxW: 1.5, valPerKg: 10, xpPerKg: 15, baits: ['Pain', 'Asticots'] },
+      { name: 'Perche commune', minW: 0.1, maxW: 1.8, valPerKg: 12, xpPerKg: 18, baits: ['Ver rouge'] }
     ]
   },
   'Winding Rivulet': {
     levelRequired: 3,
     travelCost: 100,
     fish: [
-      { name: 'Chub', minW: 0.2, maxW: 4.0, valPerKg: 14, xpPerKg: 20, baits: ['Red Worm', 'Maggots', 'Caster'] },
-      { name: 'Dace', minW: 0.02, maxW: 0.3, valPerKg: 25, xpPerKg: 30, baits: ['Bread', 'Maggots'] },
-      { name: 'Bleak', minW: 0.01, maxW: 0.08, valPerKg: 40, xpPerKg: 50, baits: ['Bread', 'Maggots'] },
-      { name: 'Gudgeon', minW: 0.01, maxW: 0.1, valPerKg: 30, xpPerKg: 35, baits: ['Red Worm', 'Maggots'] }
+      { name: 'Chevesne', minW: 0.2, maxW: 4.0, valPerKg: 14, xpPerKg: 20, baits: ['Ver rouge', 'Asticots', 'Caster'] },
+      { name: 'Vandoise', minW: 0.02, maxW: 0.3, valPerKg: 25, xpPerKg: 30, baits: ['Pain', 'Asticots'] },
+      { name: 'Ablette', minW: 0.01, maxW: 0.08, valPerKg: 40, xpPerKg: 50, baits: ['Pain', 'Asticots'] },
+      { name: 'Goujon', minW: 0.01, maxW: 0.1, valPerKg: 30, xpPerKg: 35, baits: ['Ver rouge', 'Asticots'] }
     ]
   },
   'Kuori Lake': {
     levelRequired: 12,
     travelCost: 500,
     fish: [
-      { name: 'Kuori Char', minW: 1.0, maxW: 15.0, valPerKg: 25, xpPerKg: 40, baits: ['Red Worm', 'Caster', 'Boilies (Strawberry/Banana)'] },
-      { name: 'Sevan Trout', minW: 0.5, maxW: 9.0, valPerKg: 22, xpPerKg: 35, baits: ['Red Worm', 'Boilies (Strawberry/Banana)'] },
-      { name: 'Lake Trout', minW: 1.0, maxW: 12.0, valPerKg: 20, xpPerKg: 30, baits: ['Red Worm', 'Boilies (Strawberry/Banana)'] },
-      { name: 'Pike', minW: 1.0, maxW: 16.0, valPerKg: 18, xpPerKg: 25, baits: ['Red Worm', 'Caster'] }
+      { name: 'Omble de Kuori', minW: 1.0, maxW: 15.0, valPerKg: 25, xpPerKg: 40, baits: ['Ver rouge', 'Caster', 'Bouillettes Fraise/Banane'] },
+      { name: 'Truite de Sevan', minW: 0.5, maxW: 9.0, valPerKg: 22, xpPerKg: 35, baits: ['Ver rouge', 'Bouillettes Fraise/Banane'] },
+      { name: 'Truite lacustre', minW: 1.0, maxW: 12.0, valPerKg: 20, xpPerKg: 30, baits: ['Ver rouge', 'Bouillettes Fraise/Banane'] },
+      { name: 'Brochet', minW: 1.0, maxW: 16.0, valPerKg: 18, xpPerKg: 25, baits: ['Ver rouge', 'Caster'] }
     ]
   },
   'Bear Lake': {
     levelRequired: 18,
     travelCost: 1200,
     fish: [
-      { name: 'Common Carp', minW: 2.0, maxW: 25.0, valPerKg: 15, xpPerKg: 25, baits: ['Boilies (Strawberry/Banana)', 'Caster'] },
-      { name: 'Mirror Carp', minW: 2.0, maxW: 25.0, valPerKg: 18, xpPerKg: 28, baits: ['Boilies (Strawberry/Banana)'] },
-      { name: 'Grass Carp', minW: 2.0, maxW: 20.0, valPerKg: 16, xpPerKg: 26, baits: ['Boilies (Strawberry/Banana)', 'Caster'] }
+      { name: 'Carpe commune', minW: 2.0, maxW: 25.0, valPerKg: 15, xpPerKg: 25, baits: ['Bouillettes Fraise/Banane', 'Caster'] },
+      { name: 'Carpe miroir', minW: 2.0, maxW: 25.0, valPerKg: 18, xpPerKg: 28, baits: ['Bouillettes Fraise/Banane'] },
+      { name: 'Carpe amour', minW: 2.0, maxW: 20.0, valPerKg: 16, xpPerKg: 26, baits: ['Bouillettes Fraise/Banane', 'Caster'] }
     ]
   }
 };
 
 const RODS = {
-  'Starter Tele': { maxW: 3.0, cost: 0 },
-  'Corona S60H': { maxW: 5.5, cost: 150 },
-  'Sorrento FD130': { maxW: 8.0, cost: 350 },
-  'Fortuna Feeder': { maxW: 14.5, cost: 750 },
-  'Model One FD420': { maxW: 28.0, cost: 1800 }
+  'Siberia Starter Tele': { maxW: 3.0, cost: 0 },
+  'Express Fishing Sorrento FD130': { maxW: 5.5, cost: 150 },
+  'Siberia Fortuna Feeder FD420': { maxW: 19.5, cost: 350 },
+  'Model One Feeder FD420': { maxW: 26.0, cost: 750 },
+  'Syberia SuperDuty FD420': { maxW: 35.0, cost: 1800 }
 };
 
 const REELS = {
-  'Lacerti 4000S': { maxDrag: 3.5, cost: 0 },
-  'Spark 2000S': { maxDrag: 5.5, cost: 180 },
-  'Adriatica 5000S': { maxDrag: 7.5, cost: 450 },
-  'Sabre 60s': { maxDrag: 10.0, cost: 900 },
-  'Caliber HST 8000': { maxDrag: 15.5, cost: 2200 }
+  'Express Fishing Lacerti 4000S': { maxDrag: 3.5, cost: 0 },
+  'Siberia Spark 2000S': { maxDrag: 5.5, cost: 180 },
+  'Siberia Adriatica 5000S': { maxDrag: 7.5, cost: 450 },
+  'Siberia Sabre 60s': { maxDrag: 10.0, cost: 900 },
+  'Beluga Caliber HST 8000': { maxDrag: 15.5, cost: 2200 }
 };
 
 const LINES = {
-  'Syberia Mono (3.2kg)': { strength: 3.2, cost: 0 },
-  'Syberia Mono (5.4kg)': { strength: 5.4, cost: 30 },
-  'Express Fishing Mono (7.8kg)': { strength: 7.8, cost: 70 },
-  'Simmons Mono (11.5kg)': { strength: 11.5, cost: 120 },
-  'DevilBraid (22kg)': { strength: 22.0, cost: 300 }
+  'Siberia Mono SS (3.2kg)': { strength: 3.2, cost: 0 },
+  'Siberia Mono SS (5.4kg)': { strength: 5.4, cost: 30 },
+  'Express Fishing Mono SS (7.8kg)': { strength: 7.8, cost: 70 },
+  'Simmons Mono SS (11.5kg)': { strength: 11.5, cost: 120 },
+  'Siberia DevilBraid (22kg)': { strength: 22.0, cost: 300 }
 };
 
 const BAITS = {
-  'Bread': { cost: 0, count: 999999 },
-  'Red Worm': { cost: 15, count: 30 },
-  'Maggots': { cost: 25, count: 30 },
+  'Pain': { cost: 0, count: 999999 },
+  'Ver rouge': { cost: 15, count: 30 },
+  'Asticots': { cost: 25, count: 30 },
   'Caster': { cost: 40, count: 30 },
-  'Boilies (Strawberry/Banana)': { cost: 80, count: 30 }
+  'Bouillettes Fraise/Banane': { cost: 80, count: 30 }
 };
 
-// Calculate level based on XP
 function calculateLevel(xp) {
   let level = 1;
   while (xp >= level * level * 100) {
@@ -99,7 +96,6 @@ function calculateLevel(xp) {
   return level;
 }
 
-// Authentication Middleware
 async function authenticate(req, res, next) {
   const authHeader = req.headers.authorization;
   if (!authHeader) {
@@ -119,7 +115,6 @@ async function authenticate(req, res, next) {
   }
 }
 
-// Routes
 app.post('/api/register', async (req, res) => {
   const { username, password } = req.body;
   if (!username || !password || username.length < 3 || password.length < 4) {
@@ -130,20 +125,22 @@ app.post('/api/register', async (req, res) => {
     const salt = bcrypt.genSaltSync(10);
     const password_hash = bcrypt.hashSync(password, salt);
 
+    await db.query('BEGIN');
     const result = await db.get(
       'INSERT INTO users (username, password_hash) VALUES ($1, $2) RETURNING id',
       [username, password_hash]
     );
     const userId = result.id;
 
-    // Give starting inventory
-    await db.query('INSERT INTO inventory (user_id, item_type, item_name, quantity) VALUES ($1, $2, $3, $4)', [userId, 'rod', 'Starter Tele', 1]);
-    await db.query('INSERT INTO inventory (user_id, item_type, item_name, quantity) VALUES ($1, $2, $3, $4)', [userId, 'reel', 'Lacerti 4000S', 1]);
-    await db.query('INSERT INTO inventory (user_id, item_type, item_name, quantity) VALUES ($1, $2, $3, $4)', [userId, 'line', 'Syberia Mono (3.2kg)', 1]);
-    await db.query('INSERT INTO inventory (user_id, item_type, item_name, quantity) VALUES ($1, $2, $3, $4)', [userId, 'bait', 'Bread', 999999]);
+    await db.query('INSERT INTO inventory (user_id, item_type, item_name, quantity) VALUES ($1, $2, $3, $4)', [userId, 'rod', 'Siberia Starter Tele', 1]);
+    await db.query('INSERT INTO inventory (user_id, item_type, item_name, quantity) VALUES ($1, $2, $3, $4)', [userId, 'reel', 'Express Fishing Lacerti 4000S', 1]);
+    await db.query('INSERT INTO inventory (user_id, item_type, item_name, quantity) VALUES ($1, $2, $3, $4)', [userId, 'line', 'Siberia Mono SS (3.2kg)', 1]);
+    await db.query('INSERT INTO inventory (user_id, item_type, item_name, quantity) VALUES ($1, $2, $3, $4)', [userId, 'bait', 'Pain', 999999]);
+    await db.query('COMMIT');
 
     res.json({ success: true });
   } catch (err) {
+    try { await db.query('ROLLBACK'); } catch(e) {}
     if (err.message.includes('unique constraint') || err.message.includes('UNIQUE')) {
       return res.status(400).json({ error: 'Username already exists' });
     }
@@ -199,7 +196,6 @@ app.get('/api/leaderboard', async (req, res) => {
     );
     res.json(leaderboard);
   } catch (err) {
-    console.error(err);
     res.status(500).json({ error: 'Failed to fetch leaderboard' });
   }
 });
@@ -207,21 +203,19 @@ app.get('/api/leaderboard', async (req, res) => {
 app.post('/api/fish/cast', authenticate, async (req, res) => {
   const { user } = req;
   
-  // 1. Verify bait is in inventory
-  if (user.current_bait !== 'Bread') {
+  if (user.current_bait !== 'Pain') {
     const baitInv = await db.get('SELECT quantity FROM inventory WHERE user_id = $1 AND item_type = \'bait\' AND item_name = $2', [user.id, user.current_bait]);
     if (!baitInv || baitInv.quantity <= 0) {
-      return res.status(400).json({ error: 'No bait left! Buy some from the shop.' });
+      return res.status(400).json({ error: 'Plus d\'appât ! Achetez-en dans la boutique.' });
     }
   }
 
-  // 2. Select random fish matching bait and water body
   const wb = WATER_BODIES[user.current_water_body];
-  if (!wb) return res.status(400).json({ error: 'Invalid water body' });
+  if (!wb) return res.status(400).json({ error: 'Plan d\'eau invalide' });
 
   const matchingFish = wb.fish.filter(f => f.baits.includes(user.current_bait));
   if (matchingFish.length === 0) {
-    return res.status(400).json({ error: 'This bait is not attractive to any fish here.' });
+    return res.status(400).json({ error: 'Cet appât n\'attire aucun poisson ici.' });
   }
 
   const selectedTemplate = matchingFish[Math.floor(Math.random() * matchingFish.length)];
@@ -241,8 +235,7 @@ app.post('/api/fish/cast', authenticate, async (req, res) => {
     castTime: Date.now()
   };
 
-  // Consume 1 bait if not bread
-  if (user.current_bait !== 'Bread') {
+  if (user.current_bait !== 'Pain') {
     await db.query('UPDATE inventory SET quantity = quantity - 1 WHERE user_id = $1 AND item_type = \'bait\' AND item_name = $2', [user.id, user.current_bait]);
   }
 
@@ -286,11 +279,21 @@ app.post('/api/fish/catch', authenticate, async (req, res) => {
 
     if (broke) {
       if (brokeReason.includes('fil')) {
-        await db.query('DELETE FROM inventory WHERE user_id = $1 AND item_type = \'line\' AND item_name = $2', [req.user.id, req.user.current_line]);
-        await db.query('UPDATE users SET current_line = \'Syberia Mono (3.2kg)\' WHERE id = $1', [req.user.id]);
+        const item = await db.get('SELECT quantity FROM inventory WHERE user_id = $1 AND item_type = \'line\' AND item_name = $2', [req.user.id, req.user.current_line]);
+        if (item && item.quantity > 1) {
+          await db.query('UPDATE inventory SET quantity = quantity - 1 WHERE user_id = $1 AND item_type = \'line\' AND item_name = $2', [req.user.id, req.user.current_line]);
+        } else {
+          await db.query('DELETE FROM inventory WHERE user_id = $1 AND item_type = \'line\' AND item_name = $2', [req.user.id, req.user.current_line]);
+        }
+        await db.query('UPDATE users SET current_line = \'Siberia Mono SS (3.2kg)\' WHERE id = $1', [req.user.id]);
       } else {
-        await db.query('DELETE FROM inventory WHERE user_id = $1 AND item_type = \'rod\' AND item_name = $2', [req.user.id, req.user.current_rod]);
-        await db.query('UPDATE users SET current_rod = \'Starter Tele\' WHERE id = $1', [req.user.id]);
+        const item = await db.get('SELECT quantity FROM inventory WHERE user_id = $1 AND item_type = \'rod\' AND item_name = $2', [req.user.id, req.user.current_rod]);
+        if (item && item.quantity > 1) {
+          await db.query('UPDATE inventory SET quantity = quantity - 1 WHERE user_id = $1 AND item_type = \'rod\' AND item_name = $2', [req.user.id, req.user.current_rod]);
+        } else {
+          await db.query('DELETE FROM inventory WHERE user_id = $1 AND item_type = \'rod\' AND item_name = $2', [req.user.id, req.user.current_rod]);
+        }
+        await db.query('UPDATE users SET current_rod = \'Siberia Starter Tele\' WHERE id = $1', [req.user.id]);
       }
 
       return res.json({
@@ -300,13 +303,11 @@ app.post('/api/fish/catch', authenticate, async (req, res) => {
       });
     }
 
-    // Save Catch
     await db.query(
       'INSERT INTO catches (user_id, fish_name, weight, silver_value, xp_value) VALUES ($1, $2, $3, $4, $5)',
       [req.user.id, caught.name, caught.weight, caught.silver, caught.xp]
     );
 
-    // Update User Silver, XP & Level
     const newXP = req.user.xp + caught.xp;
     const newLevel = calculateLevel(newXP);
     const newSilver = Number((req.user.silver + caught.silver).toFixed(2));
@@ -323,12 +324,10 @@ app.post('/api/fish/catch', authenticate, async (req, res) => {
       levelUp: newLevel > req.user.level ? newLevel : null
     });
   } catch (err) {
-    console.error(err);
     res.status(500).json({ error: 'Failed to record catch' });
   }
 });
 
-// Shop Route
 app.post('/api/shop/buy', authenticate, async (req, res) => {
   const { type, name } = req.body;
   let cost = 0;
@@ -340,13 +339,12 @@ app.post('/api/shop/buy', authenticate, async (req, res) => {
   else return res.status(400).json({ error: 'Invalid item type or name' });
 
   if (req.user.silver < cost) {
-    return res.status(400).json({ error: 'Not enough Silver!' });
+    return res.status(400).json({ error: 'Pas assez de Silver !' });
   }
 
   try {
     const qty = type === 'bait' ? BAITS[name].count : 1;
     
-    // Add to inventory (PostgreSQL compatible ON CONFLICT)
     await db.query(
       `INSERT INTO inventory (user_id, item_type, item_name, quantity) 
        VALUES ($1, $2, $3, $4)
@@ -360,12 +358,10 @@ app.post('/api/shop/buy', authenticate, async (req, res) => {
 
     res.json({ success: true, newSilver });
   } catch (err) {
-    console.error(err);
     res.status(500).json({ error: 'Purchase failed' });
   }
 });
 
-// Travel Route
 app.post('/api/travel', authenticate, async (req, res) => {
   const { name } = req.body;
   const wb = WATER_BODIES[name];
@@ -387,7 +383,6 @@ app.post('/api/travel', authenticate, async (req, res) => {
   }
 });
 
-// Equip Gear Route
 app.post('/api/equip', authenticate, async (req, res) => {
   const { type, name } = req.body;
 
@@ -398,7 +393,7 @@ app.post('/api/equip', authenticate, async (req, res) => {
   try {
     const item = await db.get('SELECT quantity FROM inventory WHERE user_id = $1 AND item_type = $2 AND item_name = $3', [req.user.id, type, name]);
     if (!item || item.quantity <= 0) {
-      return res.status(400).json({ error: 'You do not own this item' });
+      return res.status(400).json({ error: 'Vous ne possédez pas cet objet.' });
     }
 
     let field = '';
@@ -407,11 +402,9 @@ app.post('/api/equip', authenticate, async (req, res) => {
     else if (type === 'line') field = 'current_line';
     else if (type === 'bait') field = 'current_bait';
 
-    // Safely interpolate column name as field is predefined
     await db.query(`UPDATE users SET ${field} = $1 WHERE id = $2`, [name, req.user.id]);
     res.json({ success: true });
   } catch (err) {
-    console.error(err);
     res.status(500).json({ error: 'Equip failed' });
   }
 });
