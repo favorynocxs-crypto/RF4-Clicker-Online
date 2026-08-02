@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Russian Fishing 4 Clicker - Online</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Google Fonts for modern typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Auth Screen -->
+  <div id="auth-screen" class="screen active">
+    <div class="auth-container">
+      <div class="logo">
+        <h1>RUSSIAN FISHING 4</h1>
+        <span class="subtitle">CLICKER ONLINE</span>
+      </div>
+      <div class="card">
+        <h2 id="auth-title">Connexion</h2>
+        <form id="auth-form">
+          <div class="form-group">
+            <label for="username">Nom de pêcheur</label>
+            <input type="text" id="username" required minlength="3" placeholder="Ex: CarpHunter">
+          </div>
+          <div class="form-group">
+            <label for="password">Mot de passe</label>
+            <input type="password" id="password" required minlength="4" placeholder="••••••••">
+          </div>
+          <button type="submit" id="auth-btn" class="btn btn-primary">Se connecter</button>
+        </form>
+        <p class="auth-toggle">
+          Nouveau pêcheur ? <span id="toggle-auth">Créer un compte</span>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Game Screen -->
+  <div id="game-screen" class="screen">
+    <!-- Top HUD Bar -->
+    <header class="hud-bar">
+      <div class="hud-user">
+        <span class="user-avatar">🎣</span>
+        <div>
+          <h3 id="hud-username">Chargement...</h3>
+          <span class="hud-level">Niveau <span id="hud-lvl-val">1</span></span>
+        </div>
+      </div>
+      <div class="hud-xp">
+        <div class="xp-label">Expérience</div>
+        <div class="xp-progress-bar">
+          <div id="xp-progress" style="width: 0%"></div>
+        </div>
+        <span id="hud-xp-val">0 / 100 XP</span>
+      </div>
+      <div class="hud-currency">
+        <span class="currency-icon">🪙</span>
+        <span id="hud-silver-val">0.00</span> <span class="currency-label">Silver</span>
+      </div>
+      <button id="logout-btn" class="btn btn-danger btn-sm">Quitter</button>
+    </header>
+
+    <div class="main-layout">
+      <!-- Sidebar Panels -->
+      <aside class="sidebar">
+        <!-- Current Setup -->
+        <div class="panel gear-panel">
+          <h2>Configuration Actuelle</h2>
+          <div class="gear-setup">
+            <div class="gear-item">
+              <span class="gear-icon">🎣</span>
+              <div>
+                <label>Canne</label>
+                <div id="setup-rod" class="gear-name">Starter Tele</div>
+              </div>
+            </div>
+            <div class="gear-item">
+              <span class="gear-icon">⚙️</span>
+              <div>
+                <label>Moulinet</label>
+                <div id="setup-reel" class="gear-name">Lacerti 4000S</div>
+              </div>
+            </div>
+            <div class="gear-item">
+              <span class="gear-icon">🧵</span>
+              <div>
+                <label>Ligne</label>
+                <div id="setup-line" class="gear-name">Syberia Mono (3.2kg)</div>
+              </div>
+            </div>
+            <div class="gear-item">
+              <span class="gear-icon">🪱</span>
+              <div>
+                <label>Appât</label>
+                <div id="setup-bait" class="gear-name">Bread</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Catches -->
+        <div class="panel catch-panel">
+          <h2>Dernières Prises</h2>
+          <div class="catch-list" id="recent-catches-list">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+      </aside>
+
+      <!-- Central Game and Tab View -->
+      <main class="content-area">
+        <!-- Navigation Tabs -->
+        <nav class="nav-tabs">
+          <button class="tab-btn active" data-tab="tab-fishing">Pêche</button>
+          <button class="tab-btn" data-tab="tab-inventory">Inventaire</button>
+          <button class="tab-btn" data-tab="tab-shop">Magasin</button>
+          <button class="tab-btn" data-tab="tab-travel">Voyage</button>
+          <button class="tab-btn" data-tab="tab-leaderboard">Classement</button>
+        </nav>
+
+        <!-- Tab Content: Fishing -->
+        <div id="tab-fishing" class="tab-content active">
+          <div class="fishing-zone">
+            <div class="location-banner">
+              📍 <span id="current-location-name">Mosquito Lake</span>
+            </div>
+
+            <!-- Fishing Water & Target Click Area -->
+            <div class="water-container" id="water-area">
+              <div class="bobber-wave" id="bobber-ripple"></div>
+              <div class="bobber" id="fishing-bobber"></div>
+              
+              <div class="fishing-state-msg" id="fishing-state-msg">
+                Prêt à lancer votre ligne.
+              </div>
+
+              <!-- Fishing Main Button -->
+              <button id="action-btn" class="btn btn-action">Lancer la ligne</button>
+            </div>
+
+            <!-- Fight / Reel Combat HUD -->
+            <div class="fight-hud" id="fight-hud">
+              <h3>Combat en cours ! Maintenez la tension</h3>
+              <p>Cliquez à plusieurs reprises pour ramener le poisson, attention à ne pas casser la ligne !</p>
+              <div class="tension-meter-container">
+                <div class="tension-bar-labels">
+                  <span>Faible</span>
+                  <span>Optimal</span>
+                  <span>Zone Rouge</span>
+                </div>
+                <div class="tension-meter-bg">
+                  <div class="tension-indicator" id="tension-indicator" style="width: 50%"></div>
+                </div>
+              </div>
+              <button id="reel-btn" class="btn btn-reel">MOU L I N E R !</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab Content: Inventory -->
+        <div id="tab-inventory" class="tab-content">
+          <div class="panel">
+            <h2>Votre Sac de Pêche</h2>
+            <div class="inventory-grid" id="inventory-grid">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab Content: Shop -->
+        <div id="tab-shop" class="tab-content">
+          <div class="panel">
+            <h2>Boutique RF4</h2>
+            <div class="shop-tabs">
+              <button class="shop-tab-btn active" data-shop="rods">Cannes</button>
+              <button class="shop-tab-btn" data-shop="reels">Moulinets</button>
+              <button class="shop-tab-btn" data-shop="lines">Fils</button>
+              <button class="shop-tab-btn" data-shop="baits">Appâts</button>
+            </div>
+            <div class="shop-grid" id="shop-grid">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab Content: Travel -->
+        <div id="tab-travel" class="tab-content">
+          <div class="panel">
+            <h2>Plans d'eau disponibles</h2>
+            <p class="section-desc">Débloquez de nouveaux spots et attrapez des espèces uniques de Russian Fishing 4.</p>
+            <div class="travel-grid" id="travel-grid">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab Content: Leaderboard -->
+        <div id="tab-leaderboard" class="tab-content">
+          <div class="panel">
+            <h2>Classement des pêcheurs</h2>
+            <div class="table-container">
+              <table class="leaderboard-table">
+                <thead>
+                  <tr>
+                    <th>Rang</th>
+                    <th>Joueur</th>
+                    <th>Niveau</th>
+                    <th>XP Totale</th>
+                    <th>Argent (Silver)</th>
+                    <th>Prises</th>
+                  </tr>
+                </thead>
+                <tbody id="leaderboard-body">
+                  <!-- Dynamically populated -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Notification Popup -->
+  <div id="toast" class="toast"></div>
+
+  <!-- Catch Splash Screen -->
+  <div id="catch-splash" class="splash-overlay">
+    <div class="splash-card">
+      <div class="splash-header">Nouvelle Prise ! 🐟</div>
+      <div class="fish-display">
+        <span class="fish-graphic">🎣</span>
+        <h2 id="catch-fish-name">Crucian Carp</h2>
+        <div class="fish-detail">Poids: <span id="catch-fish-weight">1.250</span> kg</div>
+      </div>
+      <div class="splash-rewards">
+        <div class="reward-item">
+          <span class="reward-icon">🪙</span>
+          <div class="reward-val" id="catch-reward-silver">+4.50</div>
+          <div class="reward-lbl">Silver</div>
+        </div>
+        <div class="reward-item">
+          <span class="reward-icon">📈</span>
+          <div class="reward-val" id="catch-reward-xp">+120</div>
+          <div class="reward-lbl">XP</div>
+        </div>
+      </div>
+      <button id="catch-close-btn" class="btn btn-primary">Remettre dans le vivier</button>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
