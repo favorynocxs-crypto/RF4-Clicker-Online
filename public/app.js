@@ -224,7 +224,6 @@ function updateHUD() {
   
   cookieSilverVal.innerText = currentSilver.toFixed(2);
   cookieSpsVal.innerText = spsRate.toFixed(2);
-  cookieSpcVal.innerText = spcRate.toFixed(2);
   currentLocName.innerText = user.current_water_body;
   
   hudLvlVal.innerText = user.level;
